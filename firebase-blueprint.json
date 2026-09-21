@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DR-Vision Diabetic Retinopathy Clinical Workspace Schema",
+  "description": "Firestore database blueprint for clinicians, patient records, AI diagnostic predictions, and clinical audit trails.",
+  "entities": {
+    "users": {
+      "title": "Clinician User Profile",
+      "description": "Registered ophthalmologist, retina specialist, or clinical researcher profile.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "Hospital or institutional email" },
+        "displayName": { "type": "string", "description": "Clinician's formal name and credentials" },
+        "role": { "type": "string", "description": "Clinical role (e.g., Senior Retinal Specialist, Attending Ophthalmologist, Resident)" },
+        "affiliation": { "type": "string", "description": "Hospital or research institution" },
+        "licenseNumber": { "type": "string", "description": "Medical license identifier" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of account creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of profile update" }
+      },
+      "required": ["uid", "email"]
+    },
+    "patients": {
+      "title": "Patient Clinical Record",
+      "description": "Longitudinal patient record containing demographic information, diabetes duration, HbA1c history, visual acuity, and retinopathy grades.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique patient identifier" },
+        "mrn": { "type": "string", "description": "Hospital Medical Record Number" },
+        "name": { "type": "string", "description": "Patient's full legal name" },
+        "age": { "type": "number", "description": "Patient age in years" },
+        "gender": { "type": "string", "description": "Patient gender (Male, Female, Other)" },
+        "diabetesType": { "type": "string", "description": "Diabetes classification (Type 1, Type 2, Gestational)" },
+        "durationYears": { "type": "number", "description": "Years since initial diabetes diagnosis" },
+        "hbA1c": { "type": "number", "description": "Most recent glycated hemoglobin level (%)" },
+        "lastExamDate": { "type": "string", "description": "Date of last comprehensive fundus examination" },
+        "currentGrade": { "type": "number", "description": "Current diagnosed ETDRS DR Grade (0-4)" },
+        "visualAcuityOD": { "type": "string", "description": "Right eye Snellen visual acuity" },
+        "visualAcuityOS": { "type": "string", "description": "Left eye Snellen visual acuity" },
+        "status": { "type": "string", "description": "Clinical follow-up priority status" },
+        "phone": { "type": "string", "description": "Patient telephone contact" },
+        "email": { "type": "string", "description": "Patient email address" },
+        "predictionsCount": { "type": "number", "description": "Total fundus analyses performed" },
+        "notes": { "type": "string", "description": "Attending clinical notes" },
+        "createdBy": { "type": "string", "description": "UID of clinician who registered the patient" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of record creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of record update" }
+      },
+      "required": ["mrn", "name", "age", "diabetesType"]
+    },
+    "predictions": {
+      "title": "Diagnostic AI Prediction & Retinal Scan",
+      "description": "Complete inference record of retinal fundus analysis, hybrid ConvNeXtV2 + Swin feature weights, Grad-CAM attention regions, quantified microvascular lesions, and attending ophthalmologist review.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique prediction identifier" },
+        "patientId": { "type": "string", "description": "Associated patient identifier" },
+        "patientName": { "type": "string", "description": "Name of examined patient" },
+        "patientAge": { "type": "number", "description": "Age of patient at scan" },
+        "patientGender": { "type": "string", "description": "Gender of patient" },
+        "eyeSide": { "type": "string", "description": "Examined eye (OD or OS)" },
+        "timestamp": { "type": "string", "description": "Diagnostic session timestamp" },
+        "imageUrl": { "type": "string", "description": "URL or SVG representation of retinal fundus" },
+        "predictedGrade": { "type": "number", "description": "Inferred DR Grade (0 to 4)" },
+        "confidence": { "type": "number", "description": "Model confidence (0.0 to 1.0)" },
+        "probabilities": { "type": "object", "description": "Per-grade classification probabilities" },
+        "qualityScore": { "type": "number", "description": "Diagnostic image quality index (0-100)" },
+        "qualityMetrics": { "type": "object", "description": "Optical sharpness, contrast, illumination" },
+        "gradCamUrl": { "type": "string", "description": "Grad-CAM saliency heat map overlay" },
+        "gradCamRegions": { "type": "array", "description": "Regions of highest attention and significance" },
+        "lesions": { "type": "array", "description": "Quantified microaneurysms, hemorrhages, exudates" },
+        "clinicalInterpretation": { "type": "string", "description": "AI diagnostic rationale" },
+        "recommendedFollowUp": { "type": "string", "description": "AAO recommended clinical schedule" },
+        "reviewedByDoctor": { "type": "boolean", "description": "Whether an ophthalmologist reviewed this report" },
+        "reviewedAt": { "type": "string", "description": "Timestamp of specialist sign-off" },
+        "doctorNotes": { "type": "string", "description": "Physician findings and instructions" },
+        "ophthalmologistReview": { "type": "object", "description": "Structured specialist consultation and suggestions" },
+        "createdBy": { "type": "string", "description": "UID of clinician running the analysis" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["patientId", "patientName", "predictedGrade", "confidence"]
+    },
+    "audit_logs": {
+      "title": "HIPAA & Clinical Audit Trail",
+      "description": "Immutable security and clinical activity log for audit compliance and model evaluation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Audit event ID" },
+        "timestamp": { "type": "string", "description": "Time of event" },
+        "user": { "type": "string", "description": "Clinician name or system agent" },
+        "userId": { "type": "string", "description": "UID of acting user" },
+        "action": { "type": "string", "description": "Action type (e.g. LOGIN, PREDICTION_RUN, REPORT_EXPORTED)" },
+        "resource": { "type": "string", "description": "Affected entity identifier" },
+        "status": { "type": "string", "description": "Outcome status (Success, Warning, Flagged)" },
+        "details": { "type": "string", "description": "Detailed log message" }
+      },
+      "required": ["timestamp", "user", "action", "status"]
+    }
+  }
+}

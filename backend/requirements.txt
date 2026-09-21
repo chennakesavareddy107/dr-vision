@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+firebase-admin
+torch
+torchvision
+timm
+opencv-python-headless
+grad-cam
+numpy
+Pillow
+pdfkit
+jinja2
+python-dotenv

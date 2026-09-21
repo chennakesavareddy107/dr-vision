@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Clinician User Profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && (request.auth.uid == userId);
+      allow delete: if false;
+    }
+
+    // Patient Clinical Records
+    match /patients/{patientId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && request.resource.data.name is string
+        && request.resource.data.mrn is string;
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Diagnostic Predictions & Retinal Scans
+    match /predictions/{predictionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && request.resource.data.patientName is string;
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // HIPAA Audit Trail (Append-only by authenticated clinicians)
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && request.resource.data.action is string;
+      allow update, delete: if false;
+    }
+  }
+}

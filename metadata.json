@@ -1,0 +1,6 @@
+{
+  "name": "DR Vision",
+  "description": "Intelligent Multi-Feature Learning for Diabetic Retinopathy Grading with ConvNeXtV2 and Swin Transformer",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

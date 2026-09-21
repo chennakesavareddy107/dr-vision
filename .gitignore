@@ -1,0 +1,22 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example# Python
+.venv/
+venv/
+__pycache__/
+
+# Node
+node_modules/
+
+# Build
+dist/
+
+# Large model files
+*.pth
+*.pt
+*.ckpt
